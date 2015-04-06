@@ -39,6 +39,8 @@ def parse_command_line(argv):
     parser.add_argument("-s", "--screens", dest='screens', type=int,
                         default=3,
                         help="Number of screens to read images for")
+    parser.add_argument("-n", "--nitrogen", dest='nitrogen', action='store_true',
+                        help="Set to call nitrogen --restore after retrieving the images")
     parser.add_argument('subreddit', nargs='+')
     arguments = parser.parse_args(argv[1:])
     logging.basicConfig(level=max(3 - arguments.verbose_count, 0) * 10)
@@ -91,9 +93,11 @@ def main():
         newfile = os.path.join(wallpapers, "reddit-{0}".format(n))
         log.debug("Copying from {0} to {1}".format(filename, newfile))
         shutil.copyfile(filename, newfile)
-    log.info("Running nitrogen --restore")
-    os.system("nitrogen --restore >/dev/null 2>&1")
-    log.info("Ran nitrogen --restore")
+
+    if arguments.nitrogen:
+        log.info("Running nitrogen --restore")
+        os.system("nitrogen --restore >/dev/null 2>&1")
+        log.info("Ran nitrogen --restore")
 
 def random_generator(api, sub, params):
     def gen():
